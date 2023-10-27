@@ -13,7 +13,7 @@ namespace ChatUtilities
         //Setup the plugin information.
         public const string pluginGuid = "com.metalted.zeepkist.chatutilities";
         public const string pluginName = "Chat Utilities";
-        public const string pluginVersion = "1.0";
+        public const string pluginVersion = "1.1";
 
         public static ConfigFile Cfg { get; private set; }
 
@@ -49,7 +49,18 @@ namespace ChatUtilities
             ConfigEntry<string> cmd9Text = Config.Bind("Commands", "CMD9 Button", "", "Button Text For Command 9");
             ConfigEntry<string> cmd9Command = Config.Bind("Commands", "CMD9 Command", "", "Text Input For Command 9");
 
+            ConfigEntry<string> quickCommand1 = Config.Bind("Quick Commands", "Command 1", "", "");
+            ConfigEntry<string> quickCommand2 = Config.Bind("Quick Commands", "Command 2", "", "");
+            ConfigEntry<string> quickCommand3 = Config.Bind("Quick Commands", "Command 3", "", "");
+            ConfigEntry<string> quickCommand4 = Config.Bind("Quick Commands", "Command 4", "", "");
+            ConfigEntry<string> quickCommand5 = Config.Bind("Quick Commands", "Command 5", "", "");
+            ConfigEntry<string> quickCommand6 = Config.Bind("Quick Commands", "Command 6", "", "");
+            ConfigEntry<string> quickCommand7 = Config.Bind("Quick Commands", "Command 7", "", "");
+            ConfigEntry<string> quickCommand8 = Config.Bind("Quick Commands", "Command 8", "", "");
+            ConfigEntry<string> quickCommand9 = Config.Bind("Quick Commands", "Command 9", "", "");
+
             LoadCommands();
+            LoadQuickCommands();
 
             //Setup harmony
             Harmony harmony = new Harmony(pluginGuid);
@@ -65,6 +76,35 @@ namespace ChatUtilities
         private void Config_SettingChanged(object sender, SettingChangedEventArgs e)
         {
             LoadCommands();
+        }
+
+        private void LoadQuickCommands()
+        {
+            try
+            {
+                List<string> cmds = new List<string>();
+                string cmd1 = (string)Cfg["Quick Commands", "Command 1"].BoxedValue;
+                string cmd2 = (string)Cfg["Quick Commands", "Command 2"].BoxedValue;
+                string cmd3 = (string)Cfg["Quick Commands", "Command 3"].BoxedValue;
+                string cmd4 = (string)Cfg["Quick Commands", "Command 4"].BoxedValue;
+                string cmd5 = (string)Cfg["Quick Commands", "Command 5"].BoxedValue;
+                string cmd6 = (string)Cfg["Quick Commands", "Command 6"].BoxedValue;
+                string cmd7 = (string)Cfg["Quick Commands", "Command 7"].BoxedValue;
+                string cmd8 = (string)Cfg["Quick Commands", "Command 8"].BoxedValue;
+                string cmd9 = (string)Cfg["Quick Commands", "Command 9"].BoxedValue;
+
+                if (!string.IsNullOrEmpty(cmd1)) { cmds.Add(cmd1); }
+                if (!string.IsNullOrEmpty(cmd2)) { cmds.Add(cmd2); }
+                if (!string.IsNullOrEmpty(cmd3)) { cmds.Add(cmd3); }
+                if (!string.IsNullOrEmpty(cmd4)) { cmds.Add(cmd4); }
+                if (!string.IsNullOrEmpty(cmd5)) { cmds.Add(cmd5); }
+                if (!string.IsNullOrEmpty(cmd6)) { cmds.Add(cmd6); }
+                if (!string.IsNullOrEmpty(cmd7)) { cmds.Add(cmd7); }
+                if (!string.IsNullOrEmpty(cmd8)) { cmds.Add(cmd8); }
+                if (!string.IsNullOrEmpty(cmd9)) { cmds.Add(cmd9); }
+                ChatManager.quickCommandList = cmds;
+            }
+            catch { }
         }
 
         private void LoadCommands()
@@ -226,6 +266,14 @@ namespace ChatUtilities
                         ChatManager.ShowCommandWindow();
                     }
                 }
+
+                for(int i = 0; i < ChatManager.quickCommandList.Count; i++)
+                {
+                    if (GUI.Button(ChatManager.quickCommandRects[i], "" + (i + 1)))
+                    {
+                        OnlineChatUI.currentMessage += ChatManager.quickCommandList[i];
+                    }
+                }
             }
             else
             {
@@ -356,6 +404,7 @@ namespace ChatUtilities
 
         public static Rect toggleEmoticonButton;
         public static Rect toggleCommandButton;
+        public static Rect[] quickCommandRects;
         public static Rect utilWindow;
         public static Vector2 emoticonButtonSize;
         public static Vector2 commandButtonSize;
@@ -365,6 +414,7 @@ namespace ChatUtilities
 
         public static Dictionary<string, string> commandDict;
         public static List<string> commandList;
+        public static List<string> quickCommandList;
 
         public static void Initialize(OnlineChatUI chatUI)
         {
@@ -375,6 +425,7 @@ namespace ChatUtilities
             utilWindow = new Rect();
             emoticonButtonSize = new Vector2();
             commandButtonSize = new Vector2();
+            quickCommandRects = new Rect[10];
 
             RecalculateRects();
         }
@@ -471,6 +522,11 @@ namespace ChatUtilities
                 toggleEmoticonButton = new Rect(position.x + size.x, position.y, size.y, size.y);
                 toggleCommandButton = new Rect(position.x + size.x + size.y, position.y, size.y, size.y);
                 utilWindow = new Rect(position.x, position.y + size.y, size.x, Screen.height - position.y - size.y);
+
+                for (int i = 0; i < 10; i++)
+                {
+                    quickCommandRects[i] = new Rect(toggleCommandButton.x + toggleCommandButton.width * (i + 1), position.y, size.y, size.y);
+                }
 
                 emoticonButtonSize = new Vector2(utilWindow.height / 3f, utilWindow.height / 3f);
                 commandButtonSize = new Vector2(utilWindow.width / 3f, utilWindow.height / 3f);
